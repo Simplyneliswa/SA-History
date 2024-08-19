@@ -3,15 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Game</title>
+    <title>South African Quiz Game</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="overlay"></div>
     <div class="container">
-        <h1>Quiz Game</h1>
+        <div id="welcome-message" class="welcome-message">
+            <h1>Welcome to the</h1>
+            <h2>South African Quiz Game</h2>
+            <p>Test your knowledge of the Rainbow Nation!</p>
+            <p>Created by Neliswayisipho Maduma</p>
+        </div>
+        <h1>South African Quiz Game</h1>
         <div id="game">
             <div id="info">
                 <div id="score">Score: 0</div>
+                <div id="level">Level: Easy</div>
                 <div id="timer">Time: 25</div>
             </div>
             <div id="question-container">
@@ -20,9 +28,27 @@
             </div>
             <button id="start">Start Game</button>
             <button id="end-game" style="display:none;">End Game</button>
+            
             <div id="message"></div>
         </div>
     </div>
+    <div id="level-up" class="modal">
+        <div class="modal-content">
+            <h2>Congratulations!</h2>
+            <p>You've passed the <span id="completed-level"></span> level!</p>
+            <p>Moving on to <span id="next-level"></span> level...</p>
+        </div>
+    </div>
+    <div id="game-over" class="modal">
+        <div class="modal-content">
+            <h2>Game Over!</h2>
+            <p>Your final score: <span id="final-score"></span></p>
+            <p id="encouragement"></p>
+            <button id="play-again">Play Again</button>
+        </div>
+        
+    </div>
+    
     <script src="script.js"></script>
 </body>
 </html>

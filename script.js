@@ -1,4 +1,3 @@
-// script.js
 const questions = {
     easy: [
         { question: "What is the capital of South Africa?", answers: ["Johannesburg", "Pretoria", "Cape Town", "Durban"], correct: "Pretoria" },
@@ -36,6 +35,17 @@ const questions = {
         { question: "What was the primary focus of the Black Consciousness Movement in South Africa?", answers: ["Cultural pride", "Economic development", "Political reform", "International solidarity"], correct: "Cultural pride" }
     ]
 };
+//welcome message dissappears after 3 seconds
+const welcomeMessage = document.getElementById('welcome-message');
+        welcomeMessage.classList.add('show');
+        
+        setTimeout(() => {
+            welcomeMessage.classList.add('hide');
+        }, 3000);
+        
+        setTimeout(() => {
+            welcomeMessage.style.display = 'none';
+        }, 3500);
 
 const game = {
     level: 'easy',
@@ -43,17 +53,18 @@ const game = {
     questionIndex: 0,
     time: 25,
     timerInterval: null,
-    questions: questions.easy,
+    questions: [],
 
     startGame: function() {
-        this.score = 0;
-        this.questionIndex = 0;
-        this.time = 25;
-        document.getElementById('score').textContent = `Score: ${this.score}`;
-        document.getElementById('timer').textContent = `Time: ${this.time}`;
+        this.resetGame();
+        this.shuffleQuestions();
         document.getElementById('start').style.display = 'none';
         document.getElementById('end-game').style.display = 'block';
         this.loadQuestions();
+    },
+
+    shuffleQuestions: function() {
+        this.questions = [...questions[this.level]].sort(() => Math.random() - 0.5);
     },
 
     loadQuestions: function() {
@@ -70,7 +81,7 @@ const game = {
         document.getElementById('question').textContent = currentQuestion.question;
         const answersDiv = document.getElementById('answers');
         answersDiv.innerHTML = '';
-        currentQuestion.answers.forEach(answer => {
+        currentQuestion.answers.sort(() => Math.random() - 0.5).forEach(answer => {
             const button = document.createElement('button');
             button.textContent = answer;
             button.addEventListener('click', () => this.checkAnswer(answer));
@@ -120,44 +131,76 @@ const game = {
 
     checkLevel: function() {
         if (this.score < 80) {
-            document.getElementById('message').textContent = `Level Failed! Your score is ${this.score}.`;
-            this.resetGame();
+            this.endGame();
             return;
         }
-        document.getElementById('message').textContent = 'Moving to the next level...';
+        this.showLevelUp();
+    },
+//Added show level to inform the user about the level they are currently playing at
+    showLevelUp: function() {
+        const levelUpModal = document.getElementById('level-up');
+        document.getElementById('completed-level').textContent = this.level;
+        
+        if (this.level === 'easy') {
+            this.level = 'medium';
+            document.getElementById('next-level').textContent = 'medium';
+        } else if (this.level === 'medium') {
+            this.level = 'hard';
+            document.getElementById('next-level').textContent = 'hard';
+        } else {
+            this.endGame();
+            return;
+        }
+
+        levelUpModal.style.display = 'block';
         setTimeout(() => {
-            if (this.level === 'easy') {
-                this.level = 'medium';
-                this.questions = questions.medium;
-            } else if (this.level === 'medium') {
-                this.level = 'hard';
-                this.questions = questions.hard;
-            } else {
-                document.getElementById('message').textContent = `Game Over! Your final score is ${this.score}.`;
-                this.resetGame();
-                return;
-            }
+            levelUpModal.style.display = 'none';
             this.questionIndex = 0;
-            this.startGame();
-        }, 1000); // 1-second delay before moving to the next level
+            this.shuffleQuestions();
+            this.loadQuestions();
+            document.getElementById('level').textContent = `Level: ${this.level.charAt(0).toUpperCase() + this.level.slice(1)}`;
+        }, 3000);
+    },
+
+    endGame: function() {
+        clearInterval(this.timerInterval);
+        const gameOverModal = document.getElementById('game-over');
+        document.getElementById('final-score').textContent = this.score;
+        //encoragement to keep the user playing the game
+        let encouragement = "";
+        if (this.score < 80) {
+            encouragement = "Good effort! Keep practicing to improve your knowledge of South Africa.";
+        } else if (this.score < 160) {
+            encouragement = "Great job! You have a good understanding of South African history and culture.";
+        } else {
+            encouragement = "Excellent work! You're a true expert on South Africa!";
+        }
+        document.getElementById('encouragement').textContent = encouragement;
+
+        gameOverModal.style.display = 'block';
     },
 
     resetGame: function() {
+        clearInterval(this.timerInterval);
         this.level = 'easy';
         this.score = 0;
         this.questionIndex = 0;
         this.time = 25;
         document.getElementById('score').textContent = `Score: ${this.score}`;
+        document.getElementById('level').textContent = 'Level: Easy';
         document.getElementById('timer').textContent = `Time: ${this.time}`;
         document.getElementById('message').textContent = '';
         document.getElementById('start').style.display = 'block';
         document.getElementById('end-game').style.display = 'none';
+        document.getElementById('question').textContent = '';
+        document.getElementById('answers').innerHTML = '';
+        document.getElementById('game-over').style.display = 'none';
     }
 };
 
 document.getElementById('start').addEventListener('click', () => game.startGame());
-document.getElementById('end-game').addEventListener('click', () => {
+document.getElementById('end-game').addEventListener('click', () => game.endGame());
+document.getElementById('play-again').addEventListener('click', () => {
     game.resetGame();
-    document.getElementById('start').style.display = 'block';
-    document.getElementById('end-game').style.display = 'none';
+    document.getElementById('game-over').style.display = 'none';
 });
